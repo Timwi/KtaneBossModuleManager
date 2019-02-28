@@ -19,6 +19,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
 
     private void Start()
     {
+        name = "BossModuleManager";
         _functions = new Dictionary<string, object>
         {
             { "GetIgnoredModules", new Func<string, string[]>(GetIgnoredModules) },
@@ -88,6 +89,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
                     ignoredModules[(string) name.Value] = ignoreList.Select(tok => (string) ((JValue) tok).Value).ToArray();
             }
 
+            Debug.LogFormat(@"[BossModuleManager] List successfully loaded:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, ignoredModules.Select(kvp => string.Format("[BossModuleManager] {0} => {1}", kvp.Key, string.Join(", ", kvp.Value))).ToArray()));
             Settings.IgnoredModules = ignoredModules;
 
             try
@@ -107,9 +109,14 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
     private string[] GetIgnoredModules(string moduleName)
     {
         string[] ret;
-        return Settings.IgnoredModules.TryGetValue(moduleName, out ret)
-            ? ret.ToArray()   // Take a copy of the list so that the called doesn’t modify ours
-            : null;
+        if (Settings.IgnoredModules.TryGetValue(moduleName, out ret))
+        {
+            Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list successful.", moduleName);
+            return ret.ToArray();   // Take a copy of the list so that the called doesn’t modify ours
+        }
+
+        Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list failed.", moduleName);
+        return null;
     }
 
     object IDictionary<string, object>.this[string key]
