@@ -112,7 +112,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
         if (Settings.IgnoredModules.TryGetValue(moduleName, out ret))
         {
             Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list successful.", moduleName);
-            return ret.ToArray();   // Take a copy of the list so that the called doesn’t modify ours
+            return ret.ToArray();   // Take a copy of the list so that the caller doesn’t modify ours
         }
 
         Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list failed.", moduleName);
