@@ -35,6 +35,8 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
             try
             {
                 Settings = JsonConvert.DeserializeObject<BossModuleSettings>(File.ReadAllText(_settingsFile), new StringEnumConverter());
+                if (Settings == null)
+                    throw new Exception("Settings could not be read. Creating new Settings...");
                 Debug.LogFormat(@"[BossModuleManager] Settings successfully loaded");
             }
             catch (Exception e)
