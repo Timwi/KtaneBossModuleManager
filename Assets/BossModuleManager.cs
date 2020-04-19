@@ -16,6 +16,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
     private string _settingsFile;
     private BossModuleSettings Settings;
     private Dictionary<string, object> _functions;
+    private bool isLoaded;
 
     private void Start()
     {
@@ -23,7 +24,8 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
         _functions = new Dictionary<string, object>
         {
             { "GetIgnoredModules", new Func<string, string[]>(GetIgnoredModules) },
-            { "Refresh", new Action(Refresh) }
+            { "Refresh", new Action(Refresh) },
+            { "Loaded", new Func<bool>(() => isLoaded) }
         };
 
         _settingsFile = Path.Combine(Path.Combine(Application.persistentDataPath, "Modsettings"), "BossModules.json");
@@ -58,6 +60,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
 
     private IEnumerator Refresher()
     {
+        isLoaded = false;
         using (var http = UnityWebRequest.Get(Settings.SiteUrl))
         {
             // Request and wait for the desired page.
@@ -66,12 +69,14 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
             if (http.isNetworkError)
             {
                 Debug.LogFormat(@"[BossModuleManager] Website {0} responded with error: {1}", Settings.SiteUrl, http.error);
+                isLoaded = true;
                 yield break;
             }
 
             if (http.responseCode != 200)
             {
                 Debug.LogFormat(@"[BossModuleManager] Website {0} responded with code: {1}", Settings.SiteUrl, http.responseCode);
+                isLoaded = true;
                 yield break;
             }
 
@@ -79,6 +84,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
             if (allModules == null)
             {
                 Debug.LogFormat(@"[BossModuleManager] Website {0} did not respond with a JSON array at “KtaneModules” key.", Settings.SiteUrl, http.responseCode);
+                isLoaded = true;
                 yield break;
             }
 
@@ -105,6 +111,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
                 Debug.LogFormat("[BossModuleManager] Failed to save settings file:");
                 Debug.LogException(e);
             }
+            isLoaded = true;
         }
     }
 
@@ -130,10 +137,10 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
     // Support read-only operations
     ICollection<string> IDictionary<string, object>.Keys { get { return _functions.Keys; } }
     ICollection<object> IDictionary<string, object>.Values { get { return _functions.Values; } }
-    int ICollection<KeyValuePair<string, object>>.Count { get { return _functions.Count; } }
+    int ICollection<KeyValuePair<string, object>>.Count { get { if (_functions == null) return -1; return _functions.Count; } }
     bool ICollection<KeyValuePair<string, object>>.IsReadOnly { get { return true; } }
     bool ICollection<KeyValuePair<string, object>>.Contains(KeyValuePair<string, object> item) { return ((ICollection<KeyValuePair<string, object>>) _functions).Contains(item); }
-    bool IDictionary<string, object>.ContainsKey(string key) { return _functions.ContainsKey(key); }
+    bool IDictionary<string, object>.ContainsKey(string key) { return _functions != null ? _functions.ContainsKey(key) : false; }
     void ICollection<KeyValuePair<string, object>>.CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) { ((ICollection<KeyValuePair<string, object>>) _functions).CopyTo(array, arrayIndex); }
     IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator() { return _functions.GetEnumerator(); }
     IEnumerator IEnumerable.GetEnumerator() { return _functions.GetEnumerator(); }
