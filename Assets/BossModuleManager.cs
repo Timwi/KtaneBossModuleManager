@@ -16,7 +16,9 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
     private string _settingsFile;
     private BossModuleSettings Settings;
     private Dictionary<string, object> _functions;
+    private Dictionary<string, string> moduleIDs;
     private bool isLoaded;
+    private bool passed;
 
     private void Start()
     {
@@ -89,12 +91,20 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
             }
 
             var ignoredModules = new Dictionary<string, string[]>();
+            moduleIDs = new Dictionary<string, string>();
             foreach (JObject module in allModules)
             {
                 var ignoreList = module["Ignore"] as JArray;
                 var name = module["Name"] as JValue;
-                if (ignoreList != null && ignoreList.All(tok => tok is JValue && ((JValue) tok).Value is string) && name.Value is string)
-                    ignoredModules[(string) name.Value] = ignoreList.Select(tok => (string) ((JValue) tok).Value).ToArray();
+                var id = module["ModuleID"] as JValue;
+                if (ignoreList != null && ignoreList.All(tok => tok is JValue && ((JValue)tok).Value is string) && name.Value is string)
+                {
+                    if (id.Value is string)
+                        moduleIDs[(string)id.Value] = (string)name.Value;
+                    else
+                        Debug.LogFormat(@"[BossModuleManager] Failed to load ModuleID for {0}", (string)name.Value);
+                    ignoredModules[(string)name.Value] = ignoreList.Select(tok => (string)((JValue)tok).Value).ToArray();
+                }
             }
 
             Debug.LogFormat(@"[BossModuleManager] List successfully loaded:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, ignoredModules.Select(kvp => string.Format("[BossModuleManager] {0} => {1}", kvp.Key, string.Join(", ", kvp.Value))).ToArray()));
@@ -118,13 +128,18 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
     private string[] GetIgnoredModules(string moduleName)
     {
         string[] ret;
+        if (moduleIDs.ContainsKey(moduleName))
+            moduleName = moduleIDs[moduleName];
         string moduleName2 = moduleName.Contains("'") ? moduleName.Replace("'", "’") : moduleName.Replace("’", "'");
         if (Settings.IgnoredModules.TryGetValue(moduleName, out ret) || Settings.IgnoredModules.TryGetValue(moduleName2, out ret))
         {
             Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list successful.", moduleName);
             return ret.ToArray();   // Take a copy of the list so that the caller doesn’t modify ours
         }
-        Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list failed.", moduleName);
+
+        if (!passed) Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list failed using the module's display name.", moduleName);
+        else Debug.LogFormat(@"[BossModuleManager] Request for {0}’s ignore list failed using the module's id.", moduleName);
+        passed = true;
         return null;
     }
 
