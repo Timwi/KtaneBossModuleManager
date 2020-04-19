@@ -97,13 +97,13 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
                 var ignoreList = module["Ignore"] as JArray;
                 var name = module["Name"] as JValue;
                 var id = module["ModuleID"] as JValue;
-                if (ignoreList != null && ignoreList.All(tok => tok is JValue && ((JValue)tok).Value is string) && name.Value is string)
+                if (ignoreList != null && ignoreList.All(tok => tok is JValue && ((JValue) tok).Value is string) && name.Value is string)
                 {
                     if (id.Value is string)
-                        moduleIDs[(string)id.Value] = (string)name.Value;
+                        moduleIDs[(string) id.Value] = (string) name.Value;
                     else
-                        Debug.LogFormat(@"[BossModuleManager] Failed to load ModuleID for {0}", (string)name.Value);
-                    ignoredModules[(string)name.Value] = ignoreList.Select(tok => (string)((JValue)tok).Value).ToArray();
+                        Debug.LogFormat(@"[BossModuleManager] Failed to load ModuleID for {0}", (string) name.Value);
+                    ignoredModules[(string) name.Value] = ignoreList.Select(tok => (string) ((JValue) tok).Value).ToArray();
                 }
             }
 
