@@ -15,8 +15,8 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
 {
     private string _settingsFile;
     private BossModuleSettings Settings;
-    private Dictionary<string, object> _functions;
-    private Dictionary<string, string> moduleIDs;
+    private Dictionary<string, object> _functions = new Dictionary<string, object>();
+    private Dictionary<string, string> moduleIDs = new Dictionary<string, string>();
     private bool isLoaded;
     private bool passed;
 
@@ -41,6 +41,12 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
                 Settings = JsonConvert.DeserializeObject<BossModuleSettings>(File.ReadAllText(_settingsFile), new StringEnumConverter());
                 if (Settings == null)
                     throw new Exception("Settings could not be read. Creating new Settings...");
+                // Do not allow someone to set Settings.IgnoredModules to null in the JSON file
+                if (Settings.IgnoredModules == null)
+                {
+                    Debug.LogFormat(@"[BossModuleManager] Settings file has a null list of ignored modules.");
+                    Settings.IgnoredModules = new Dictionary<string, string[]>();
+                }
                 Debug.LogFormat(@"[BossModuleManager] Settings successfully loaded");
             }
             catch (Exception e)
