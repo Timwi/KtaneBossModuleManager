@@ -100,7 +100,7 @@ public class BossModuleManager : MonoBehaviour, IDictionary<string, object>
             moduleIDs = new Dictionary<string, string>();
             foreach (JObject module in allModules)
             {
-                var ignoreList = module["Ignore"] as JArray;
+                var ignoreList = module["IgnoreProcessed"] as JArray ?? module["Ignore"] as JArray;
                 var name = module["Name"] as JValue;
                 var id = module["ModuleID"] as JValue;
                 if (ignoreList != null && ignoreList.All(tok => tok is JValue && ((JValue) tok).Value is string) && name.Value is string)
