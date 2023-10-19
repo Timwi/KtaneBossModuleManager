@@ -1,0 +1,10 @@
+{
+  "name": "BossModuleManager-Editor",
+  "references": [
+    "BossModuleManager"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}

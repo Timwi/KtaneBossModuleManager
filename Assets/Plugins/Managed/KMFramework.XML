@@ -309,9 +309,20 @@
             The amount of time on the needy timer whenever this module is activated.
             </summary>
         </member>
+        <member name="F:KMNeedyModule.ResetDelayMin">
+            <summary>
+            The minimum amount of time before the needy module will reset
+            </summary>
+        </member>
+        <member name="F:KMNeedyModule.ResetDelayMax">
+            <summary>
+            The maximum amount of time before the needy module will reset
+            </summary>
+        </member>
         <member name="F:KMNeedyModule.ModuleType">
             <summary>
-            The identifier for the module as referenced in missions. e.g. "BigButton"
+            The identifier for the module as referenced in missions. e.g. "BigButton". 
+            Also known as a "Module ID".
             </summary>
         </member>
         <member name="F:KMNeedyModule.ModuleDisplayName">
@@ -511,6 +522,15 @@
         <member name="M:KMBombInfo.GetSolvedModuleNames">
             <returns>A list of the solved module names on the current bomb.</returns>
         </member>
+        <member name="M:KMBombInfo.GetModuleIDs">
+            <returns>A list of the module IDs on the current bomb. A module ID is "ModuleType" for mod modules and a ComponentType string for base game modules.</returns>
+        </member>
+        <member name="M:KMBombInfo.GetSolvableModuleIDs">
+            <returns>A list of the solvable module IDs on the current bomb. A module ID is "ModuleType" for mod modules and a ComponentType string for base game modules.</returns>
+        </member>
+        <member name="M:KMBombInfo.GetSolvedModuleIDs">
+            <returns>A list of the solved module IDs on the current bomb. A module ID is "ModuleType" for mod modules and a ComponentType string for base game modules.</returns>
+        </member>
         <member name="M:KMBombInfo.QueryWidgets(System.String,System.String)">
             <summary>
             Query all widgets on the bomb using the given queryKey. Use this to get information about things like battery count, indicator labels, or
@@ -534,6 +554,7 @@
         <member name="F:KMBombModule.ModuleType">
             <summary>
             The identifier for the module as referenced in missions. e.g. "BigButton"
+            Also known as a "Module ID".
             </summary>
         </member>
         <member name="F:KMBombModule.ModuleDisplayName">
@@ -740,7 +761,7 @@
         </member>
         <member name="F:KMGameInfo.KMModuleInfo.ModuleId">
             <summary>
-            The id of the module
+            The ModuleType of the module (for mod modules) or the ComponentType (for base game modules)
             </summary>
         </member>
         <member name="F:KMGameInfo.KMModuleInfo.IsMod">
@@ -1005,12 +1026,14 @@
         </member>
         <member name="F:KMSelectable.OnSelect">
             <summary>
-            Called whenever this selectable becomes the current selection
+            Called whenever this selectable becomes the current selectable.
+            CAUTION This behaves unintuitively, probably better to use OnHighlight or OnFocus instead
             </summary>
         </member>
         <member name="F:KMSelectable.OnDeselect">
             <summary>
             Called whenever this selectable stops being the current selectable
+            CAUTION This behaves unintuitively, probably better to use OnHighlightEnded or OnDefocus instead
             </summary>
         </member>
         <member name="F:KMSelectable.OnCancel">
@@ -1032,6 +1055,21 @@
         <member name="F:KMSelectable.OnHighlight">
             <summary>
             Called when the highlight is turned on, OnSelect is probably more appropriate for most things
+            </summary>
+        </member>
+        <member name="F:KMSelectable.OnHighlightEnded">
+            <summary>
+            Called when the highlight is turned off
+            </summary>
+        </member>
+        <member name="F:KMSelectable.OnFocus">
+            <summary>
+            Called when a module is focused, this is when it is interacted with from the bomb face level and this module's children can be selected
+            </summary>
+        </member>
+        <member name="F:KMSelectable.OnDefocus">
+            <summary>
+            Called when a module is defocused, this is when a different selectable becomes the focus or the module has been backed out of
             </summary>
         </member>
         <member name="F:KMSelectable.OnLeft">
@@ -1088,6 +1126,11 @@
             </summary>
         </member>
         <member name="F:KMSelectable.OnInteractionPunch">
+            <summary>
+            DO NOT USE IN MOD. Used by the game to hook into the selectable.
+            </summary>
+        </member>
+        <member name="F:KMSelectable.OnUpdateChildren">
             <summary>
             DO NOT USE IN MOD. Used by the game to hook into the selectable.
             </summary>

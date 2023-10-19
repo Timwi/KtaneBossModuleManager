@@ -6,8 +6,8 @@ namespace Assets
     {
         public string SiteUrl = @"https://ktane.timwi.de/json/raw";
 
-        public Dictionary<string, string[]> IgnoredModules = new Dictionary<string, string[]>();
+        public Dictionary<string, string[]> IgnoredModuleIds = new Dictionary<string, string[]>();
 
-        public int Version = 1;
+        public int Version = 2;
     }
 }
